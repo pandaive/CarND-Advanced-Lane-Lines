@@ -1,6 +1,5 @@
-import cv2
 import numpy as np
-import pickle
+import cv2
 
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)   
@@ -13,8 +12,15 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
-def transform(image, M):
+def process(image):
     imshape = image.shape
-    warped = cv2.warpPerspective(image, M, (imshape[1], imshape[0]), flags=cv2.INTER_LINEAR)
+    a = (350,imshape[0])
+    b = (350, 600)
+    c = (100,0)
+    d = (imshape[1],0)
+    e = (1010, 600)
+    f = (1010, imshape[0])
+    roi_points = np.array([[a, b, c, d, e, f]], dtype=np.int32)
+    selected_final = region_of_interest(image, roi_points)
 
-    return warped
+    return selected_final

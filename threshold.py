@@ -26,8 +26,7 @@ def mag_thresh(img, sobel_kernel=3, mag_thresh=(0,255)):
 Direction of the gradient is computed with arctan(sobely/sobelx)
 '''
 def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi/2)):
-    #gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    gray = img
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
     abs_sobelx = np.absolute(sobelx)
@@ -50,12 +49,10 @@ def s_select(img):
     return s
 
 def process_image(image):
-    hls = s_select_thresh(image, (170, 255))
+    hls = s_select_thresh(image, (140, 255))
     s = s_select(image)
-    sobelx = abs_sobel_thresh(s, 'x', 20, 100)
-    #sobely = abs_sobel_thresh(s, 'y', 20, 100)
-    #sobelxy = mag_thresh(s, 3, (20, 50))
-    dr = dir_threshold(s, 3,(0.7, 1.3))
+    sobelx = abs_sobel_thresh(s, 'x', 7, 140)
+    dr = dir_threshold(image, 3,(0.001, 0.3))
     combined = np.zeros_like(s)
     combined[((dr == 1) & (sobelx == 1)) | (hls == 1)] = 1
     return combined
