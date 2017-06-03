@@ -1,20 +1,21 @@
 import cv2
 import pickle
-import threshold
-import find_lane_lines as finder
-import curvature_measurement as cm
 import matplotlib.pyplot as plt
-import draw_lane as dl
-import transform_perspective as trp
 import glob
-import warp
+from methods import threshold
+from methods import find_lane_lines as finder
+from methods import curvature_measurement as cm
+from methods import draw_lane as dl
+from methods import transform_perspective as trp
+from methods import warp
 
-dist_pickle = pickle.load( open( "calibration.p", "rb" ) )
+dist_pickle = pickle.load( open( "params/calibration.p", "rb" ) )
 mtx = dist_pickle[0]
 dist = dist_pickle[1]
 
-M = pickle.load(open( "perspectiveTransformMatrix.p", "rb" ))
-Minv = pickle.load(open( "oppositePerspectiveTransformMatrix.p", "rb" ))
+M = pickle.load(open( "params/perspectiveTransformMatrix.p", "rb" ))
+Minv = pickle.load(open( "params/oppositePerspectiveTransformMatrix.p", "rb" ))
+
 
 def process(image):
     dst = cv2.undistort(image, mtx, dist, None, mtx)
