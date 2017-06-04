@@ -17,8 +17,8 @@ dst = np.float32([[offsetx,imshape[0]-offsety],
                     [imshape[1]-offsetx, imshape[0]-offsety]])
 
 M = cv2.getPerspectiveTransform(src, dst)
-Minv = cv2.getPerspectiveTransform(dst, src))
+Minv = cv2.getPerspectiveTransform(dst, src)
 
-pickle.dump(M, open("params/perspectiveTransformMatrix.p", "wb"))
-pickle.dump(Minv, open("params/oppositePerspectiveTransformMatrix.p", "wb"))
+pickle.dump(M, open("../params/perspectiveTransformMatrix.p", "wb"))
+pickle.dump(Minv, open("../params/oppositePerspectiveTransformMatrix.p", "wb"))
 print("Perspective transform matrix saved")

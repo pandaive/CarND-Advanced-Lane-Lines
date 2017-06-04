@@ -23,5 +23,5 @@ for i, filename in enumerate(calibration_images):
 test_image = cv2.imread('../test_images/straight_lines1.jpg')
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imagepoints, test_image.shape[:2], None, None)
 
-pickle.dump((mtx, dist), open("params/calibration.p", "wb"))
+pickle.dump((mtx, dist), open("../params/calibration.p", "wb"))
 print("Calibration data saved")
