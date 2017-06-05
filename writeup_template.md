@@ -118,7 +118,7 @@ I implemented this step in file `draw_lane.py` which is used in `track_lines.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [final output video](./project_video.mp4)
 
 ---
 
@@ -126,4 +126,14 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
+Main file in my project is `P4.py`. I run it by
+```
+python3 P4.py [input_filename] [output_filename] [nb_frames]
+```
+Where nb_frames argument states how many frames from the past will be analyzed during processing of the video. I usually used 4 frames.
+Each frame of the video is going through method _process_image_ of `track_lines.py`. This class (_TrackLines_) is used through the entire processing and it handles the parameters, history of detected lines and all steps of processing of new images.
+In lines #29-#32 it creates new instance of a _Lines_ class (implenented in file `lines.py` in `utils` directory) and passes historical values for left and right lanes. This class handles both lines of the single frame. It is responsible for performing sanity checks of currently detected lines and comparing them with previous lines in order to get the best fit for the current frame.
+In lines #34-#38 it performs image processing and lane lines detection. When lane lines are found in #38, they are being passed to the current instance of the _Lines_ class. After evaluation in _Lines_ we get data for left and right lane and the boolean value stating if the evaluation was correct or not (it is incorrect if lane lanes weren't find or there was is no historical detections yet, so there is nothing to evaluate the results with).
+Based on the evaluation, param _incorrect_frames_ is altered accordingly. Thanks to that, in case if the frame is not evaluated, I cut the last pixels (20 per incorrect frame) from the output drawing, so there is no "fake predictions" in the output video (no lanes found, no drawing on coming lane). It can be seen in the output video around 0'40s in the output video when there are couple of incorrectly processed frames in a row.
+At the end, I draw the lane marking and needed data onto the frame and return it.

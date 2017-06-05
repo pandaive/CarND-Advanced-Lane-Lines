@@ -36,7 +36,6 @@ class TrackLines():
         thresholded = threshold.process_image(transformed)
         warped = warp.process(thresholded)
         left_fitx, right_fitx, ret = finder.find(warped, self.ploty)
-        parallel = 0
         if ret == True:
             self.detected = True
             lines.setCurrentFit(left_fitx, right_fitx)
