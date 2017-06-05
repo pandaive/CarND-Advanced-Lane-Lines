@@ -22,6 +22,8 @@ The goals / steps of this project are the following:
 [image4]: ./test_images/result.jpg "Undistorted"
 [image5]: ./test_images/result_transformed.jpg "Transformed"
 [image6]: ./test_images/result_thresholded.jpg "Thresholded and warped"
+[image7]: ./test_images/result_with_lines.jpg "With lines"
+[image8]: ./test_images/result_final.jpg "With lines"
 [video1]: ./project_video.mp4 "Video"
 
 ### [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -34,7 +36,7 @@ The goals / steps of this project are the following:
 
 ##### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-The code for this step is contained in the file called `camera_calibration.py` in _utils_ directory.  
+The code for this step is contained in the file called `camera_calibration.py` in `utils` directory.  
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -52,8 +54,8 @@ Here is application of distortion correction to one of the actual images of the 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 I applied perspective transform before thresholding, not too loose too much of the upper lines part from thresholded image.
-The code for my perspective transform includes a file `transform_perspective.py` and a file `warp.py` both in _methods_ directory. I also used a separate script for generating transform matrix and reversed transform matrix, so it's not repeated in processing of every image (this file can be found in _utils_ direcotry and is called `get_perspective_transform_matrix.py`).
-I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a file `transform_perspective.py` in `methods` directory. I also used a separate script for generating transform matrix and reversed transform matrix, so it's not repeated in processing of every image (this file can be found in `utils` direcotry and is called `get_perspective_transform_matrix.py`).
+I chose to hardcode the source and destination points in the following manner:
 
 ```python
 a = (276,imshape[0]-50)
@@ -79,35 +81,36 @@ This resulted in the following source and destination points:
 | 695, 450     | 880, 0      |
 | 1020, 670      | 880, 720        |
 
+Perspective transform of processed frame is triggered in line #35 in file `track_lines.py`.
 Transformed image:
-![alt text][image4]
+![alt text][image5]
 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps methods and steps (method _process_image_) in `threshold.py` in _methods_ directory). I use all the line points from thresholded *S* layer from image in HLS color space and aditionally I get points by applying sobel of x gradients on *S* layer of image in HLS color space and checking if the direction of the gradients is in specified range. All of the threshold parameters can be found in lines #52-#55 and they are mostly the result of trial-and-error method of adjusting them.
-For the video frames, thresholding is applied using defined before _process_image_ method called in `track_lines.py` file in line #36
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps methods and steps (method _process_image_) in `threshold.py` in `methods` directory). I use all the line points from thresholded *S* layer from image in HLS color space and aditionally I get points by applying sobel of x gradients on *S* layer of image in HLS color space and checking if the direction of the gradients is in specified range. All of the threshold parameters can be found in lines #52-#55 in `threshold.py` and they are mostly the result of trial-and-error method of adjusting them.
+For the video frames, thresholding is applied using defined before _process_image_ method called in `track_lines.py` file in line #36. After threshold is done, I also use `warp.py` from `methods` directory to select only the region of interest of the image. The ROI points I chose can be found in lines #17-#22 of the `warp.py` file.
+Color thresholding and selecting ROI of processed image is triggered in lines #36-#37 in `track_lines.py` file.
 Here's an example of my output for this step.
 
-
-![alt text][image3]
+![alt text][image6]
 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Code for finding lane lines can be found in file `find_lane_lines.py` in `methods` directory. I used the method shown in the course with window search and adjusting a second order polynomial. It's used in frame processing in line #38 in file `track_lines.py`. I save right and left line **x** values for evaluation. This is an example with drawn lines.
 
-![alt text][image5]
+![alt text][image7]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I calculate the radius of curvature in file `curvature_measurement.py` in `methods` directory, following the idea given in the course. Calculation for each image is triggered in line #51 in file `track_lines.py`. The position of the car with respect to the road center is calculated in `track_lines.py` in line #52.
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in file `draw_lane.py` which is used in `track_lines.py` in line #54.  It uses reversed perspective transform matrix generated before with `get_perspective_transform_matrix.py` in `utils` directory. Here is an example of my result on a test image:
 
-![alt text][image6]
+![alt text][image8]
 
 ---
 
@@ -115,7 +118,8 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a final output video:
+![alt text][video1]
 
 ---
 
